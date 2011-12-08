@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the order module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+ function price_schema() {
+  $schema['j_category'] = array(
+    'description' => 'The base table for order.',
+    'fields' => array(
+      'tid' => array(
+        'description' => '',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'c_name' => array(
+        'description' => '',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'weight' => array(
+        'description' => '',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => '',
+      ),
+      'status' => array(
+        'description' => '',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'indexes' => array(
+      'order_type'  => array('product'),
+    ),
+    'unique keys' => array(
+      'oid' => array('oid'),
+    ),
+    'foreign keys' => array(
+      'order_type' => array(
+        'table' => 'orders_type',
+        'columns' => array('product' => 'tid'),
+      ),
+    ),
+    'primary key' => array('oid'),
+  );
+
+  $schema['orders_type'] = array(
+    'description' => '',
+    'fields' => array(
+      'tid' => array(
+        'description' => '',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => "",
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      
+    ),
+    'primary key' => array('tid'),
+  );
+  $schema['orders_num'] = array(
+    'description' => '',
+    'fields' => array(
+      'nid' => array(
+        'description' => '',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'volume' => array(
+        'description' => "",
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      
+    ),
+    'primary key' => array('nid'),
+  );
+
+  return $schema;
+ }

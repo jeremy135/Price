@@ -1,0 +1,12 @@
+;$Id$
+
+name = Price
+description = Provide create price list in tables with diffirent categories.
+
+core = 7.x
+package = J Custom Modules
+
+files[] = price.module
+f;iles[] = price.admin.inc
+
+;dependencies[] = taxonomy
