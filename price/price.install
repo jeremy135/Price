@@ -27,34 +27,31 @@
         'description' => '',
         'type' => 'int',
         'not null' => FALSE,
-        'default' => '',
+        'default' => '0',
       ),
       'status' => array(
         'description' => '',
         'type' => 'int',
         'not null' => TRUE,
-        'default' => '',
+        'default' => '0',
       ),
     ),
-    'indexes' => array(
-      'order_type'  => array('product'),
-    ),
     'unique keys' => array(
-      'oid' => array('oid'),
+      'tid' => array('tid'),
     ),
     'foreign keys' => array(
-      'order_type' => array(
-        'table' => 'orders_type',
+      'j_category' => array(
+        'table' => 'j_price',
         'columns' => array('product' => 'tid'),
       ),
     ),
-    'primary key' => array('oid'),
+    'primary key' => array('tid'),
   );
 
-  $schema['orders_type'] = array(
+  $schema['j_price'] = array(
     'description' => '',
     'fields' => array(
-      'tid' => array(
+      'pid' => array(
         'description' => '',
         'type' => 'serial',
         'unsigned' => TRUE,
@@ -66,20 +63,47 @@
         'length' => 255,
         'not null' => TRUE,
       ),
-      
+      'cost' => array(
+        'description' => "",
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'tid' => array(
+        'description' => "",
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'vid' => array(
+        'description' => "",
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'weight' => array(
+        'description' => "",
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => '0',
+      ),
+      'status' => array(
+        'description' => "",
+        'type' => 'int',
+        'default' => '0',
+        'not null' => TRUE,
+      ),
     ),
-    'primary key' => array('tid'),
+    'primary key' => array('pid'),
   );
-  $schema['orders_num'] = array(
+  $schema['j_val'] = array(
     'description' => '',
     'fields' => array(
-      'nid' => array(
+      'vid' => array(
         'description' => '',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'volume' => array(
+      'val' => array(
         'description' => "",
         'type' => 'varchar',
         'length' => 255,
@@ -87,7 +111,7 @@
       ),
       
     ),
-    'primary key' => array('nid'),
+    'primary key' => array('vid'),
   );
 
   return $schema;

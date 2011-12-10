@@ -1,28 +1,23 @@
 <?php
-function price_init() {
-   menu_rebuild();
-}
 function price_menu() {
 	$items = array();
 
 	$items['price'] = array(
 		'title' => t('Price'),
-		'page callback' => 'show_price_page',
+		'page callback' => 'price_show_price_page',
 		'access arguments' => array('access content'),
 		'type' => MENU_NORMAL_ITEM,
 	);
 	$items['admin/price'] = array(
 		'title' => t('Price'),
 		'page callback' => 'drupal_get_form',
-		'page arguments' => array('show_price'),
-       /* 'page callback' => 'show_price',*/
+		'page arguments' => array('price_show_price'),
 		'access arguments' => array('administer price'),
-		'type' => MENU_NORMAL_ITEM,
-		/*'file' => 'price.admin.inc', */  
+		'type' => MENU_NORMAL_ITEM, 
 	);
 	$items['admin/price/view'] = array(
 		'title' => t('Price'),
-		'page callback' => 'show_price',
+		'page callback' => 'price_show_price',
 		'access arguments' => array('administer price'),
 		'type' => MENU_DEFAULT_LOCAL_TASK,
 		'file' => 'price.admin.inc',    
@@ -32,16 +27,12 @@ function price_menu() {
 		'page callback' => 'drupal_get_form',
         'page arguments' => array('price_show_form_ajax', 4),
 		'access arguments' => array('administer price'),
-		/*'type' => MENU_DEFAULT_LOCAL_TASK,
-		'file' => 'price.admin.inc',   */ 
 	);
     $items['admin/price/%'] = array(
 		'title' => t('Price'),
 		'page callback' => 'drupal_get_form',
         'page arguments' => array('price_show_form', 2),
 		'access arguments' => array('administer price'),
-		//'type' => MENU_DEFAULT_LOCAL_TASK,
-		/*'file' => 'price.admin.inc',    */
 	);
 	$items['admin/price/add'] = array(
 		'title' => t('Add Product/Service'),
@@ -56,7 +47,6 @@ function price_menu() {
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('price_edit_product_form', 3),
 		'access arguments' => array('administer price'),
-		/*'type' => MENU_LOCAL_ACTION,*/
 		'file' => 'price.admin.inc',    
 	);
     $items['admin/price/del/%'] = array(
@@ -64,12 +54,11 @@ function price_menu() {
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('price_delete_form', 3),
 		'access arguments' => array('administer price'),
-		/*'type' => MENU_LOCAL_ACTION,*/
 		'file' => 'price.admin.inc',    
 	);
 	$items['admin/price/val'] = array(
 		'title' => t('Val'),
-		'page callback' => 'show_val',
+		'page callback' => 'price_show_val',
 		'access arguments' => array('administer price'),
 		'type' => MENU_LOCAL_TASK,
 		'file' => 'price.admin.inc',    
@@ -84,24 +73,22 @@ function price_menu() {
 	);
 	$items['admin/price/val/del/%'] = array(
 		'title' => t('Val'),
-		'page callback' => 'delete_val',
+		'page callback' => 'price_delete_val',
 		'access arguments' => array('administer price'),
 		'page arguments' => array(4),
 		'file' => 'price.admin.inc',    
 	);
 	$items['admin/price/val/edit/%'] = array(
 		'title' => t('Edit val'),
-		//'page callback' => 'edit_val_form',
         'page callback' => 'drupal_get_form',
-		'page arguments' => array('edit_val_form', 4),
+		'page arguments' => array('price_edit_val_form', 4),
 		'access arguments' => array('administer price'),
-		//'page arguments' => array(4),
 		'file' => 'price.admin.inc',    
 	);
 	$items['admin/price/cat'] = array(
 		'title' => t('Categories'),
 		'page callback' => 'drupal_get_form',
-		'page arguments' => array('show_cat_form'),
+		'page arguments' => array('price_show_cat_form'),
 		'access arguments' => array('administer price'),
 		'file' => 'price.admin.inc',
 		'type' => MENU_LOCAL_TASK,    
@@ -119,12 +106,11 @@ function price_menu() {
 		'page callback' => 'drupal_get_form',
 		'page arguments' => array('price_edit_cat_form', 4),
 		'access arguments' => array('administer price'),
-		/*'type' => MENU_LOCAL_ACTION,*/
 		'file' => 'price.admin.inc',    
 	);
 	$items['admin/price/cat/del/%'] = array(
 		'title' => t('Val'),
-		'page callback' => 'delete_cat',
+		'page callback' => 'price_delete_cat',
 		'access arguments' => array('administer price'),
 		'page arguments' => array(4),
 		'file' => 'price.admin.inc',    
@@ -141,7 +127,7 @@ function price_permission() {
 		),
 	);
 }
-function show_price() {
+function price_show_price() {
     drupal_add_library('system', 'drupal.ajax');
 	$result = db_select('j_category','jc')->fields('jc')->execute();
 	$options = array();
@@ -155,7 +141,7 @@ function show_price() {
         '#options' => $options,
         '#required' => true,
         '#ajax' => 	array(
-			'callback' => 'get_price',
+			'callback' => 'price_get_price',
 			'wrapper' => 'price_wrapper',
 			'method' => 'replace',
 			'effect' => 'fade',
@@ -166,7 +152,7 @@ function show_price() {
 	return $form;
 }
 
-function get_price($form, $form_state){
+function price_get_price($form, $form_state){
   
     $cat = $form_state['values']['cat'];
     
@@ -174,7 +160,7 @@ function get_price($form, $form_state){
 }
 function price_theme() {
 	return array(
-		'show_cat_form' => array(
+		'price_show_cat_form' => array(
 			'render element' => 'form',
 		),
         'price_show_form' => array(
@@ -286,10 +272,9 @@ function theme_price_show_form_ajax($variables) {
 		$row[] = drupal_render($form['product'][$pid]['weight']);
         $row[] = drupal_render($form['product'][$pid]['status']);
         $row[] = $cost.'<span class="val"> '.$val .'</span>';
-		$row[] = l(('delete'), 'admin/price/del/' . $pid) . '&#32;' . l(('edit'), 'admin/price/edit/' . $pid);
+		$row[] =  l(('edit'), 'admin/price/edit/' . $pid) . '&#32;&#32;&#32;&#32;'. l(('delete'), 'admin/price/del/' . $pid)  ;
         
 		$rows[] = array('data' => $row, 'class' => array('draggable', 'row-' . $pid), 'sticky' => FALSE/*, 'style' =>$bg_color*/);
-		//$i++;
 	}
 
 	drupal_add_tabledrag('selected', 'order', 'sibling', 'selected-weight');
@@ -298,7 +283,7 @@ function theme_price_show_form_ajax($variables) {
 	$output .= drupal_render_children($form);
 	return $output;
 }
-function show_price_page() {
+function price_show_price_page() {
     $path = drupal_get_path('module', 'price');
 	
 	drupal_add_css($path . '/price.css', 'file');
@@ -309,16 +294,14 @@ function show_price_page() {
         $tid = $item->tid;
         $cat = $item->c_name;
         $result = db_query("SELECT jp.*, jv.val FROM {j_price} jp INNER JOIN {j_val} jv ON jp.vid = jv.vid WHERE jp.status = :status AND jp.tid = :tid ORDER BY jp.weight ASC", array(':status' => 1, ':tid' => $tid));
-        $output .= make_table($cat, $result);
+        $output .= price_make_table($cat, $result);
     }
     return $output;
 }
-function make_table($cap, $data) {
+function price_make_table($cap, $data) {
     $caption = $cap;
-    //$rows[] = array();
     $header = array(t('Product'), t('Cost'));
     $i = 0;
-    //dsm($data);
     $output = '';
     foreach($data as $item) {
         $i++;
@@ -326,8 +309,7 @@ function make_table($cap, $data) {
         $row[] = $item->name;
         $row[] = $item->cost . '<span class="val"> '.$item->val .'</span>';
         $rows[] = array('data' => $row, 'class' => array( 'row-' . $i), 'sticky' => FALSE);
-    }
-    //$output .=  3;   
+    }  
     $output = theme('table', array('header' => $header, 'rows' => $rows, 'caption' => $caption, 'attributes' => array('id' => 'price-table-')));
     return $output;  
 }

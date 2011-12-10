@@ -1,5 +1,5 @@
 <?php 
-function show_val() {
+function price_show_val() {
 	$query = db_select('j_val','jv')->fields('jv');
 		
 	$header = array(t('#'), t('val'), t('Actions'));
@@ -60,12 +60,12 @@ function price_add_val_form_submit($form, &$form_state) {
 	drupal_set_message('Val has added');
 	$form_state['redirect'] = 'admin/price/val';
 }
-function delete_val($vid){
-    $form = drupal_get_form('val_delete_form', $vid);
+function price_delete_val($vid){
+    $form = drupal_get_form('price_val_delete_form', $vid);
     return drupal_render($form);
 }
 
-function val_delete_form($form, &$form_state, $vid) {
+function price_val_delete_form($form, &$form_state, $vid) {
 	$form = array();
 	$form['vid'] = array(
 		'#type' => 'hidden',
@@ -75,7 +75,7 @@ function val_delete_form($form, &$form_state, $vid) {
 	return $confirm;
 }
 
-function val_delete_form_submit($form, &$form_state) {
+function price_val_delete_form_submit($form, &$form_state) {
 	$form = array();
 	$vid = $form_state['values']['vid'];
 	
@@ -111,7 +111,7 @@ function val_delete_form_submit($form, &$form_state) {
 	//$output = 'Testing information';
 	return $output;
 }*/
-function show_cat_form() {
+function price_show_cat_form() {
     $query = db_select('j_category','jc')->fields('jc')->orderBy('weight', 'ASC');
     //dsm($result);
     //$questions =
@@ -120,51 +120,54 @@ function show_cat_form() {
 	
 	
 	$result = $query->execute();
+	
     foreach ($result as $value) {
 		$cat[] = $value;
 	}
-	$delta = round(count($cat) / 2);
-
-	$form['result'] = array(
-		'#tree' => TRUE,
-	);
-
-	foreach ($cat as $tid => $item) {
-		$form['result'][$item->tid]['#item'] = (object) array(
-					'tid' => $item->tid,
-					'c_name' => $item->c_name,
-					'weight' => $item->weight,
-					'status' => $item->status,
+	if(!isset($cat)) {
+		$form['no_category'] = array(
+			'#markup' => t('No categories'),
 		);
-		$form['result'][$item->tid]['#weight'] = $item->weight;
-		$form['result'][$item->tid]['weight'] = array(
-			'#type' => 'weight',
-			'#title' => t('Weight for @title', array('@title' => $item->c_name)),
-			'#title_display' => 'invisible',
-			'#delta' => $delta,
-			'#default_value' => $item->weight,
-			'#attributes' => array('class' => array('selected-weight')),
-		);
-        $form['result'][$item->tid]['status'] = array (
-            '#type' => 'checkbox', 
-            //'#title' => t('Previewcomment'), 
-            '#default_value' => $item->status, 
-            //'#options' => array(t('Optional'), t('Required')),
-        );
+		return $form;
 	}
-    
-	$form['actions'] = array('#type' => 'actions');
-	$form['actions']['submit'] = array(
-		'#type' => 'submit',
-		'#value' => t('Save order'),
-	//	'#submit' => array('sfaq_weight_submit'),
-	); 
+		$delta = round(count($cat) / 2);
 	
+		$form['result'] = array(
+			'#tree' => TRUE,
+		);
+	
+		foreach ($cat as $tid => $item) {
+			$form['result'][$item->tid]['#item'] = (object) array(
+						'tid' => $item->tid,
+						'c_name' => $item->c_name,
+						'weight' => $item->weight,
+						'status' => $item->status,
+			);
+			$form['result'][$item->tid]['#weight'] = $item->weight;
+			$form['result'][$item->tid]['weight'] = array(
+				'#type' => 'weight',
+				'#title' => t('Weight for @title', array('@title' => $item->c_name)),
+				'#title_display' => 'invisible',
+				'#delta' => $delta,
+				'#default_value' => $item->weight,
+				'#attributes' => array('class' => array('selected-weight')),
+			);
+			$form['result'][$item->tid]['status'] = array (
+				'#type' => 'checkbox', 
+				'#default_value' => $item->status, 
+			);
+		}
+		
+		$form['actions'] = array('#type' => 'actions');
+		$form['actions']['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t('Save order'),
+		); 
 	
 	
 	return $form;
 }
-function show_cat_form_submit($form, &$form_state) {
+function price_show_cat_form_submit($form, &$form_state) {
     $varables = $form_state['values']['result'];
     foreach ($varables as $tid => $item) {
 
@@ -178,35 +181,36 @@ function show_cat_form_submit($form, &$form_state) {
 	}
     drupal_set_message('Порядок сохранен');
 }
-function theme_show_cat_form($variables) {
-//	ctools_include('ajax');
+function theme_price_show_cat_form($variables) {
+
 	$form = $variables['form'];
-    //dsm($form);
-	$header = array(t('Category'), t('Weight'), t('Published'), t('Operations'));
-	$i = 0;
-	$rows = array();
-	foreach (element_children($form['result']) as $tid) {
-		$c_name = $form['result'][$tid]['#item']->c_name;
-		$status = $form['result'][$tid]['#item']->status;
-        $tid = $form['result'][$tid]['#item']->tid;
-		$bg_color = 'background-color:#BBDDFF';
-		//$pu = ($status) ? l('Отключить', "sfaq/do/unpublish/$qid") : l('Включить', "sfaq/do/publish/$qid");
-		
-		$row = array();
-		$row[] = $c_name;
-		$row[] = drupal_render($form['result'][$tid]['weight']);
-        $row[] = drupal_render($form['result'][$tid]['status']);
-		$row[] =  l(('edit'), 'admin/price/cat/edit/' . $tid) . '&#32; &#32;&#32;' . l(('delete'), 'admin/price/cat/del/' . $tid);
-        
-		$rows[] = array('data' => $row, 'class' => array('draggable', 'row-' . $tid), 'sticky' => FALSE/*, 'style' =>$bg_color*/);
-		$i++;
+	if(!isset($form['result'])) {
+		return ;
 	}
-
-	drupal_add_tabledrag('selected', 'order', 'sibling', 'selected-weight');
-
-	$output = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'selected')));
-	$output .= drupal_render_children($form);
-
+		$header = array(t('Category'), t('Weight'), t('Published'), t('Operations'));
+		$i = 0;
+		$rows = array();
+		foreach (element_children($form['result']) as $tid) {
+			$c_name = $form['result'][$tid]['#item']->c_name;
+			$status = $form['result'][$tid]['#item']->status;
+			$tid = $form['result'][$tid]['#item']->tid;
+			$bg_color = 'background-color:#BBDDFF';
+			
+			$row = array();
+			$row[] = $c_name;
+			$row[] = drupal_render($form['result'][$tid]['weight']);
+			$row[] = drupal_render($form['result'][$tid]['status']);
+			$row[] =  l(('edit'), 'admin/price/cat/edit/' . $tid) . '&#32; &#32;&#32;' . l(('delete'), 'admin/price/cat/del/' . $tid);
+			
+			$rows[] = array('data' => $row, 'class' => array('draggable', 'row-' . $tid), 'sticky' => FALSE/*, 'style' =>$bg_color*/);
+			$i++;
+		}
+	
+		drupal_add_tabledrag('selected', 'order', 'sibling', 'selected-weight');
+	
+		$output = theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'selected')));
+		$output .= drupal_render_children($form);
+	
 	return $output;
 }
 
@@ -239,15 +243,15 @@ function price_add_cat_form_submit($form, &$form_state) {
 	$cat = $form_state['values']['cat'];
 	$fields = array('c_name'=> $cat);
 	db_insert('j_category')->fields($fields)->execute();
-	drupal_set_message('Cat has added');
+	drupal_set_message(t('Cat has added'));
 	$form_state['redirect'] = 'admin/price/cat';
 }
-function delete_cat($tid){
-	$form = drupal_get_form('cat_delete_form', $tid);
+function price_delete_cat($tid){
+	$form = drupal_get_form('price_cat_delete_form', $tid);
     return drupal_render($form);
 }
 
-function cat_delete_form($form, &$form_state, $tid) {
+function price_cat_delete_form($form, &$form_state, $tid) {
 	$form = array();
 	$form['tid'] = array(
 		'#type' => 'hidden',
@@ -257,7 +261,7 @@ function cat_delete_form($form, &$form_state, $tid) {
 	return $confirm;
 }
 
-function cat_delete_form_submit($form, &$form_state) {
+function price_cat_delete_form_submit($form, &$form_state) {
 	$form = array();
 	$tid = $form_state['values']['tid'];
 	
@@ -284,7 +288,7 @@ function price_add_product_form() {
 	$form['cat'] = array (
 		'#type' => 'select',
 		'#title' => t('Category'),
-		'#options' => $options1,
+		'#options' => ($options1) ? $options1 : '',
 		'#required' => TRUE,	
 	);
 	//$options2['0'] = t('Choose Val');
@@ -295,7 +299,7 @@ function price_add_product_form() {
 	$form['vid'] = array (
 		'#type' => 'select',
 		'#title' => t('Val'),
-		'#options' => $options2,
+		'#options' => ($options2) ? $options2 : '',
 		'#required' => TRUE,	
 	);
 	$form['submit'] = array(
@@ -325,7 +329,7 @@ function price_add_product_form_submit($form, &$form_state) {
 	drupal_set_message(t('Product has added'));
 	$form_state['redirect'] = 'admin/price';
 }
-function edit_val_form($form, &$form_state, $vid) {
+function price_edit_val_form($form, &$form_state, $vid) {
 	$result = db_select('j_val', 'jv')->fields('jv')->condition('vid', $vid, '=')->execute()->fetchObject();
 	
 	$form['val'] = array(
@@ -344,7 +348,7 @@ function edit_val_form($form, &$form_state, $vid) {
 	);
 	return $form;
 }
-function edit_val_form_submit($form, &$form_state) {
+function price_edit_val_form_submit($form, &$form_state) {
 	///dsm($form_state);
     $val = $form_state['values']['val'];
     $vid = $form_state['values']['vid'];
@@ -352,7 +356,7 @@ function edit_val_form_submit($form, &$form_state) {
         'val'=> $val,   
     );
     db_update('j_val')->condition('vid', $vid, '=')->fields($fields)->execute();
-    drupal_set_message('Val has saved');
+    drupal_set_message(t('Val has saved'));
     $form_state['redirect'] = 'admin/price/val';
 }
 function price_show_form($form, &$form_state, $cat) {
@@ -366,9 +370,7 @@ function price_show_form($form, &$form_state, $cat) {
                    ->execute();*/
     $result = db_query("SELECT jp.*, jv.val FROM {j_price} jp INNER JOIN {j_val} jv ON jp.vid = jv.vid WHERE jp.tid = :tid ORDER BY jp.weight ASC", array(':tid' => $cat));
     $cat_name = db_select('j_category','jc')->condition('tid', $cat, '=')->fields('jc', array('c_name'))->execute()->fetchField();
-   /*  dsm($cat_name);*/
-     //dsm($result);
-    //$questions =
+  
     foreach ($result as $value) {
 		$products[] = $value;
 	}
@@ -397,10 +399,8 @@ function price_show_form($form, &$form_state, $cat) {
 			'#attributes' => array('class' => array('selected-weight')),
 		);
         $form['product'][$item->pid]['status'] = array (
-            '#type' => 'checkbox', 
-            //'#title' => t('Previewcomment'), 
+            '#type' => 'checkbox',  
             '#default_value' => $item->status, 
-            //'#options' => array(t('Optional'), t('Required')),
         );
 	}
    $form['value'] = array (
@@ -411,7 +411,6 @@ function price_show_form($form, &$form_state, $cat) {
 	$form['actions']['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Save order'),
-	//	'#submit' => array('sfaq_weight_submit'),
 	);
 
 	return $form;
@@ -492,7 +491,7 @@ function price_edit_cat_form_submit ($form, &$form_state) {
         'c_name'=> $c_name,   
     );
     db_update('j_category')->condition('tid', $tid, '=')->fields($fields)->execute();
-    drupal_set_message('Category has saved');
+    drupal_set_message(t('Category has saved'));
     $form_state['redirect'] = 'admin/price/cat';
 }
 function price_edit_product_form($form, &$form_state, $pid) {
