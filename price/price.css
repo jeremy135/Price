@@ -1,31 +1,41 @@
-table#price-table-  {
-    border:1px solid #000;
-    width:100%;
-    padding:3px;
-    margin-bottom:15px;
-	color: #000;
+table#price-table- {
+  border: 1px solid #000;
+  width: 100%;
+  padding: 3px;
+  margin-bottom: 15px;
+  color: #000;
 }
-table#price-table- td,  table#price-table- th{
-    padding:7px;
-    border-bottom: 1px solid #000;
+
+table#price-table- td,
+table#price-table- th {
+  padding: 7px;
+  border-bottom: 1px solid #000;
 }
+
 #price-table- caption {
-    text-align:left;
-	text-transform: uppercase;
-	font-weight:bold;
+  text-align: left;
+  text-transform: uppercase;
+  font-weight: bold;
 }
-#price-table- tr td :first-child,  #price-table- tr th :first-child{
-    width:80%;
+
+#price-table- tr td :first-child,
+#price-table- tr th :first-child {
+  width: 80%;
 }
-#price-table- tr td:last-child, #price-table- tr th :last-child {
-    width:20%;
+
+#price-table- tr td:last-child,
+#price-table- tr th :last-child {
+  width: 20%;
 }
+
 #price-table- tr.odd {
-    background: #ccc;
+  background: #CCC;
 }
+
 #price-table- tr.even {
-    background: #fff;
+  background: #FFF;
 }
-#selected caption{
-	text-transform: uppercase;
+
+#selected caption {
+  text-transform: uppercase;
 }

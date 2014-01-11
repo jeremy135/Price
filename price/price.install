@@ -8,7 +8,7 @@
 /**
  * Implements hook_schema().
  */
- function price_schema() {
+function price_schema() {
   $schema['j_category'] = array(
     'description' => 'The base table for order.',
     'fields' => array(
@@ -109,10 +109,10 @@
         'length' => 255,
         'not null' => TRUE,
       ),
-      
+
     ),
     'primary key' => array('vid'),
   );
 
   return $schema;
- }
+}
